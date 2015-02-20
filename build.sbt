@@ -1,8 +1,8 @@
 // ======== imports ========
 import Resolvers._
 import Dependencies._
-import com.typesafe.sbt.SbtMultiJvm
-import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
+//import com.typesafe.sbt.SbtMultiJvm
+//import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 import scalariform.formatter.preferences._
 
 // ======== settings ========
@@ -26,8 +26,6 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-Xlint",
-  "-language:_",
-  "-target:jvm-1.6",
   "-encoding", "UTF-8"
 )
 
@@ -40,25 +38,3 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(AlignSingleLineCaseStatements, true)
 
 
-// ======== multi-jvm plugin ========
-lazy val akka_crdt = Project (
-  "akka-crdt",
-  file("."),
-  settings = Defaults.defaultSettings ++ multiJvmSettings,
-  configurations = Configurations.default :+ MultiJvm
-)
-
-lazy val multiJvmSettings = SbtMultiJvm.multiJvmSettings ++ Seq(
-  compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test), // make sure that MultiJvm test are compiled by the default test compilation
-  parallelExecution in Test := false,                                          // disable parallel tests
-  executeTests in Test <<=
-    ((executeTests in Test), (executeTests in MultiJvm)) map {
-      case ((testResults), (multiJvmResults)) =>
-        val overall =
-          if (testResults.overall.id < multiJvmResults.overall.id) multiJvmResults.overall
-          else testResults.overall
-        Tests.Output(overall,
-          testResults.events ++ multiJvmResults.events,
-          testResults.summaries ++ multiJvmResults.summaries)
-   }
-)
