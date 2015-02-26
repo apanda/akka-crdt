@@ -4,7 +4,7 @@
 
 package akka.crdt.convergent
 
-import akka.crdt.RestServer
+//import akka.crdt.RestServer
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -76,12 +76,6 @@ class ConvergentReplicatedDataTypeDatabase(sys: ExtendedActorSystem) extends Ext
   Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
 
   system.registerOnTermination(shutdown())
-
-  private val restServer = if (settings.RestServerRun) {
-    val rs = new RestServer(this)
-    rs.start()
-    Some(rs)
-  } else None
 
   def update(counter: GCounter): GCounter = {
     log.debug("Updating CvRDT [{}]", counter)
@@ -244,6 +238,7 @@ class Replicator(settings: ConvergentReplicatedDataTypeSettings)
   }
 }
 
+/* Responsible for resubmitting until things are received */
 object Resubmittor {
   case class ReplicaSetChange(replicas: immutable.Set[Address])
   case class VerifyAckFor(replica: Address, changeSet: Journal.ChangeSet)
