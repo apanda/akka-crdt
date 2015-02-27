@@ -137,7 +137,6 @@ class ConvergentReplicatedDataTypeDatabase(sys: ExtendedActorSystem) extends Ext
 
   def shutdown(): Unit = {
     log.info("Shutting down ConvergentReplicatedDataTypeDatabase...")
-    restServer foreach { _.shutdown() }
     system.stop(journal)
     system.stop(replicator)
     storage.destroy()
